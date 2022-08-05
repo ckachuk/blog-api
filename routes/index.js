@@ -3,12 +3,13 @@ var router = express.Router();
 var postController = require('../controllers/postController');
 var categoryController = require('../controllers/categoryController');
 var authController = require('../controllers/authController')
-
+var privilegeController = require('../controllers/privilegeController')
+const passport = require('passport');
 
 
 //posts routes
 
-router.get('/api/posts/published', postController.getAllPosts);
+router.get('/api/posts/published', passport.authenticate('jwt', {session: false}), postController.getAllPosts);
 
 router.get('/api/posts/unpublished', postController.getPostsUnpublishAuthor);
 
@@ -44,9 +45,9 @@ router.post('/api/signup', authController.postSignUp);
 
 //privileges routes
 
-router.post('/api/privileges/admin', privilegesController.becomeAdmin);
+router.post('/api/privilege/admin', privilegeController.becomeAdmin);
 
-router.post('/api/privileges/author', privilegesController.becomeAuthor);
+router.post('/api/privilege/author', privilegeController.becomeAuthor);
 
 
 
