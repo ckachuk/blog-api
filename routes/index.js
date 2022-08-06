@@ -9,9 +9,9 @@ const passport = require('passport');
 
 //posts routes
 
-router.get('/api/posts/published', passport.authenticate('jwt', {session: false}), postController.getAllPosts);
+router.get('/api/posts/published', postController.getAllPosts);
 
-router.get('/api/posts/unpublished', postController.getPostsUnpublishAuthor);
+router.get('/api/posts/unpublished',  passport.authenticate('jwt', {session: false}), postController.getPostsUnpublishAuthor);
 
 router.post('/api/post', postController.createPost);
 
@@ -45,7 +45,7 @@ router.post('/api/signup', authController.postSignUp);
 
 //privileges routes
 
-router.post('/api/privilege/admin', privilegeController.becomeAdmin);
+router.post('/api/privilege/admin',  privilegeController.becomeAdmin);
 
 router.post('/api/privilege/author', privilegeController.becomeAuthor);
 
