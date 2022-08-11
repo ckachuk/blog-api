@@ -12,7 +12,7 @@ const checkKeyValue = (key, realKey)=>{
 
 exports.becomeAdmin = (req, res, next)=>{
     if(checkKeyValue(req.body.key, process.env.ADMIN_KEY)){
-        User.findById(req.body.userid, (err, user)=>{
+        User.findById(req.body.currentUserid, (err, user)=>{
             if(err){return next(err)}
     
             if(!user){
@@ -37,7 +37,7 @@ exports.becomeAdmin = (req, res, next)=>{
 
 exports.becomeAuthor = (req, res, next)=>{
     if(checkKeyValue(req.body.key, process.env.AUTHOR_KEY)){
-        User.findById(req.body.userid, (err, user)=>{
+        User.findById(req.body.currentUserid, (err, user)=>{
             if(err){return next(err)}
     
             if(!user){
