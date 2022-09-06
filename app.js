@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
+var helmet = require('helmet');
 var mongoose = require('mongoose');
 require('dotenv').config()
 require('./passport');
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(helmet())
 
 app.use('/', indexRouter);
 
@@ -44,6 +45,10 @@ app.use(function(err, req, res, next) {
   res.json(err);
 });
 
+
+app.listen(5000 , function () {
+  console.log(' app listening on port 5000 !');
+});
 
 
 module.exports = app;

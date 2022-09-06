@@ -12,28 +12,28 @@ const passport = require('passport');
 
 router.get('/api/posts/published', postController.getAllPublishPosts);
 
-router.get('/api/posts/unpublished',  passport.authenticate('jwt', {session: false}), postController.getPostsUnpublishAuthor);
+router.post('/api/posts/unpublished', passport.authenticate('jwt', {session: false}), postController.getPostsUnpublishAuthor);
 
-router.post('/api/post', postController.createPost);
+router.post('/api/post', passport.authenticate('jwt', {session: false}), postController.createPost);
 
 router.get('/api/post/:postid', postController.getPost);
 
-router.post('/api/post/:postid', postController.updatePost);
+router.post('/api/post/:postid', passport.authenticate('jwt', {session: false}), postController.updatePost);
 
-router.delete('/api/post/:postid', postController.deletePost);
+router.delete('/api/post/:postid', passport.authenticate('jwt', {session: false}), postController.deletePost);
 
-router.post('/api/post/:postid/comment', postController.createComment);
+router.post('/api/post/:postid/comment', passport.authenticate('jwt', {session: false}), postController.createComment);
 
-router.delete('/api/post/:postid/comment/:commentid', postController.deleteComment);
+router.delete('/api/post/:postid/comment/:commentid', passport.authenticate('jwt', {session: false}), postController.deleteComment);
 
 
 //category routes
 
 router.get('/api/categories', categoryController.getCategories);
 
-router.post('/api/category', categoryController.createCategory);
+router.post('/api/category', passport.authenticate('jwt', {session: false}), categoryController.createCategory);
 
-router.delete('/api/category/:id', categoryController.deleteCategory);
+router.delete('/api/category/:id', passport.authenticate('jwt', {session: false}), categoryController.deleteCategory);
 
 router.get('/api/category/:id', categoryController.getAllPostsOfCategory)
 
@@ -46,9 +46,9 @@ router.post('/api/signup', authController.postSignUp);
 
 //privileges routes
 
-router.post('/api/privilege/admin',  privilegeController.becomeAdmin);
+router.post('/api/privilege/admin', passport.authenticate('jwt', {session: false}), privilegeController.becomeAdmin);
 
-router.post('/api/privilege/author', privilegeController.becomeAuthor);
+router.post('/api/privilege/author', passport.authenticate('jwt', {session: false}), privilegeController.becomeAuthor);
 
 //user routes
 

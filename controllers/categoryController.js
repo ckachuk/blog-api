@@ -44,7 +44,7 @@ exports.createCategory = [
 ]
 
 exports.deleteCategory = (req, res, next)=>{
-    User.findOne({id: req.body.currentUser}) 
+    User.findOne({id: req.body.currentUserid}) 
     .populate('credential')
     .exec( (err, user)=>{
         if(err){return next(err)}
@@ -64,7 +64,9 @@ exports.deleteCategory = (req, res, next)=>{
 }
 
 exports.getAllPostsOfCategory = (req, res, next)=>{
-    Post.find({"category": {$all:  req.params.id}}, (err, posts)=>{
+    Post.find({"category": {$all:  req.params.id}, publish:true})
+    .populate('category')
+    .exec((err, posts)=>{
         if(err){ return next(err)}
 
         res.json({status: "OK", message:"All posts of category", posts:posts});

@@ -6,10 +6,12 @@ var {body, validationResult} = require("express-validator");
 var _ = require('lodash');
 
 exports.getAllPublishPosts = (req, res, next)=>{
-    Post.find({publish:true}, (err, posts)=>{
+    Post.find({publish:true})
+    .populate('category')
+    .exec((err, posts)=>{
         if(err){return next(err)}
 
-        if(posts.isEmpty()){
+        if(posts.length === 0){
             return res.json({ status:"OK", message:"The blog has no entries"});
         }
 
@@ -20,10 +22,15 @@ exports.getAllPublishPosts = (req, res, next)=>{
 exports.getPost = (req, res, next)=>{
     async.parallel({
         post: function(callback){
-            Post.findById(req.params.postid, callback)
+            Post.findById(req.params.postid)
+            .populate('category')
+            .populate('user')
+            .exec(callback)
         },
         comments: function(callback){
-            Comment.find({post: req.params.postid}, callback)
+            Comment.find({post: req.params.postid})
+            .populate('user')
+            .exec(callback);
         } 
     }, (err, results)=>{
         if(err){return next(err)}
@@ -58,7 +65,8 @@ exports.createPost =[
             body: req.body.body,
             publish: false,
             user: req.body.currentUserid,
-            category: req.body.category
+            category: req.body.category,
+            date_created: new Date().toISOString()
         })
         if(!errors.isEmpty()){
             return res.json({status:"FAILED", message: errors.array()})
@@ -85,7 +93,7 @@ exports.createPost =[
 exports.updatePost = [
     (req, res, next) => {
         if(!(req.body.category instanceof Array)){
-            if(typeof req.body.genre ==='undefined')
+            if(typeof req.body.category ==='undefined')
             req.body.category = [];
             else
             req.body.category = new Array(req.body.category);
@@ -104,6 +112,7 @@ exports.updatePost = [
             publish: req.body.publish,
             user: req.body.currentUserid,
             category: (typeof req.body.category==='undefined') ? [] : req.body.category,
+            date_created: req.body.date_created,
             _id: req.params.postid
         })
         if(!errors.isEmpty()){
@@ -145,6 +154,7 @@ exports.deletePost = (req, res, next) =>{
         if(err){return next(err)}
         
         if(_.isEqual(results.user._id, results.post.user) || results.user.credential.isAdmin){
+
             Post.findByIdAndDelete(req.params.postid, (err)=>{
                 if(err){return next(err)}
                 Comment.deleteMany({post: req.params.postid}, (err)=>{
@@ -154,7 +164,7 @@ exports.deletePost = (req, res, next) =>{
             })
         }
         else{
-           return res.json({status: "FAILED AUTHENTICATION", message: "The user does not have the permission"})
+           return res.json({status: "FAILED", message: "The user does not have the permission"})
         }
     }))
    
@@ -169,7 +179,8 @@ exports.createComment =[
         var comment = new Comment({
             body: req.body.body,
             user: req.body.currentUserid,
-            post: req.params.postid
+            post: req.params.postid,
+            date_created: new Date().toISOString()
         })
 
         if(!errors.isEmpty()){
@@ -229,18 +240,20 @@ exports.getPostsUnpublishAuthor = (req, res, next) =>{
     async.series({
         user: function(callback){
             User.findById(req.body.currentUserid)
+            .populate('credential')
             .exec(callback)
         },
         posts: function(callback){
             Post.find({user: req.body.currentUserid, publish: false})
-            .populate('user')
+            .populate('category')
             .exec(callback)
         }
     }, ((err, results)=>{
         if(err){return next(err)}
-
-        if(results.user.isAuthor){
-            if(results.posts.isEmpty()){
+        
+        if(results.user.credential.isAuthor){
+            console.log(results.posts)
+            if(results.posts.length === 0){
                 return res.json({ status:"OK", message:"The user has no entries in unpublish posts"});
             }
     

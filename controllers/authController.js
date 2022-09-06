@@ -17,12 +17,13 @@ exports.postLogin = (req, res, next)=>{
             });
         }
         
-        jwt.sign({_id: user._id, username: user.username}, process.env.JWT_KEY, {expiresIn: "20m"}, (err, token)=>{
+        jwt.sign({_id: user._id, username: user.username}, process.env.JWT_KEY, {expiresIn: "24hr"}, (err, token)=>{
             if(err){return res.status(401).json(err)}
 
             res.json({
+                status: "OK",
                 token: token,
-                user: {_id: user._id, username: user.username}
+                user: {_id: user._id, username: user.username},
             })
         })
     })(req,res)
@@ -40,7 +41,6 @@ exports.postSignUp = [
             isAuthor: false
         });
 
-
         var user = new User({
             username: req.body.username,
             password: req.body.password,
@@ -51,21 +51,29 @@ exports.postSignUp = [
             res.json({status: "FAILED",  message: errors.array()})
         }
         else{
-            credential.save((err)=>{
-                if(err){ return next(err)}
-            });  
+            const usernameCount = await User.countDocuments({username: req.body.username});
             
-            const salt = await bcrypt.genSalt(10);
-
-            user.password = await bcrypt.hash(user.password, salt);
+            if(usernameCount > 0){
+                res.json({status: "FAILED",  message: 'The username has been used'})
+            }
+            else{
+                credential.save((err)=>{
+                    if(err){ return next(err)}
+                });  
+                
+                const salt = await bcrypt.genSalt(10);
+    
+                user.password = await bcrypt.hash(user.password, salt);
+                
+                
+                user.save((err)=>{
+                    if(err){ return next(err)}
+    
+                    res.json({status: "OK", message:"The user has been created"})
+                });
+            }
+            }
             
-
-            user.save((err)=>{
-                if(err){ return next(err)}
-
-                res.json({status: "OK", message:"The user has been created"})
-            });
-        }
 
     }
 ]
