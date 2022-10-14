@@ -142,7 +142,7 @@ exports.updatePost = [
 exports.deletePost = (req, res, next) =>{
     async.parallel({
         user: function(callback){
-            User.findById(req.body.currentUserid)
+            User.findOne({id: req.body.currentUserid}) 
             .populate('credential')
             .exec(callback)
         },
@@ -152,7 +152,6 @@ exports.deletePost = (req, res, next) =>{
         }
     }, ((err, results)=>{
         if(err){return next(err)}
-        
         if(_.isEqual(results.user._id, results.post.user) || results.user.credential.isAdmin){
 
             Post.findByIdAndDelete(req.params.postid, (err)=>{
@@ -239,12 +238,12 @@ exports.getPostsUnpublishAuthor = (req, res, next) =>{
 
     async.series({
         user: function(callback){
-            User.findById(req.body.currentUserid)
+            User.findById(req.params.userid)
             .populate('credential')
             .exec(callback)
         },
         posts: function(callback){
-            Post.find({user: req.body.currentUserid, publish: false})
+            Post.find({user: req.params.userid, publish: false})
             .populate('category')
             .exec(callback)
         }
@@ -252,7 +251,6 @@ exports.getPostsUnpublishAuthor = (req, res, next) =>{
         if(err){return next(err)}
         
         if(results.user.credential.isAuthor){
-            console.log(results.posts)
             if(results.posts.length === 0){
                 return res.json({ status:"OK", message:"The user has no entries in unpublish posts"});
             }

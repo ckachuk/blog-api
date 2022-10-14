@@ -12,7 +12,7 @@ const passport = require('passport');
 
 router.get('/api/posts/published', postController.getAllPublishPosts);
 
-router.post('/api/posts/unpublished', passport.authenticate('jwt', {session: false}), postController.getPostsUnpublishAuthor);
+router.get('/api/posts/unpublished/:userid', passport.authenticate('jwt', {session: false}), postController.getPostsUnpublishAuthor);
 
 router.post('/api/post', passport.authenticate('jwt', {session: false}), postController.createPost);
 
