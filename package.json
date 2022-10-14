@@ -6,7 +6,7 @@
     "node": "14.17.6"
   },
   "scripts": {
-    "start": " set DEBUG=myapp:* & npm start",
+    "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "serverstart": "SET DEBUG=blog-api:* & npm run devstart"
   },
