@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 
-app.listen(process.env.PORT || 5000 , function () {
+app.listen(5000 , function () {
   console.log(' app listening on port 5000 !');
 });
 
